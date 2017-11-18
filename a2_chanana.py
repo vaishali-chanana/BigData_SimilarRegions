@@ -40,7 +40,17 @@ def nameForImage(x):
         v = l+"-"+str(cnt)
         yield(v,y[cnt])
 
-
+def intensifyPixel(x):
+    m,n,r = x.shape
+    #intensityArr = np.zeros((m,n))
+    intensityTest = []
+    for i in range(0,m):
+        for j in range(0,n):
+            rgb_mean = (x[i][j][0] + x[i][j][1] + x[i][j][2])/3
+            #intensity = int(rgb_mean * (x[i][j][3]/100))
+            #intensityArr[i][j] = intensity
+            intensityTest.append(rgb_mean)
+    return intensityTest
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName("BDAssi2_vchanana").setMaster("local[2]")
@@ -62,5 +72,10 @@ if __name__ == "__main__":
     # for printing 1(e)
     oneRdd = tiffRdd.filter(lambda x: x[0] in {"3677454_2025190.zip-0","3677454_2025195.zip-1","3677454_2025195.zip-18","3677454_2025195.zip-19"}).map(lambda x:x[1][0][0])
     print("\n----------------Step 1 Results----------------------\n")
-    print(oneRdd.collect())
+    #print(oneRdd.collect())
+
+    #__VAISHALI__2017_11_16__Part 2
+    featureRdd = tiffRdd.map(lambda x: (x[0], intensifyPixel(x[1])))
+    print("\n----------------Step 2 Results----------------------\n")
+    print(len(featureRdd.collect()))
 
