@@ -43,44 +43,40 @@ def nameForImage(x):
         v = l+"-"+str(cnt)
         yield(v,y[cnt])
 
+def printresult(x,type):
+    print("----", type, "Result----", x[0], x[1])
+    return x
+
 def intensifyPixel(x):
     m,n,r = x.shape
-    intensityArr = np.zeros((m,n))
-    #intensityTest = []
+    intensityArr = np.zeros((m,n),dtype=int)
     for i in range(0,m):
         for j in range(0,n):
-            rgb_mean = (x[i][j][0] + x[i][j][1] + x[i][j][2])/3
-            intensity = int(rgb_mean * (x[i][j][3]/100))
-            intensityArr[i][j] = intensity
-            #intensityTest.append(rgb_mean)
+            intensityArr[i][j] = int(sum(x[i][j][:-1])*x[i][j][3]/300)
     return intensityArr
 
 def meanIntensity(x,t):
     rowRange = range(0,x.shape[0],t)
     colRange = range(0,x.shape[1],t)
-    reshaped = np.zeros((int(x.shape[0]/t),int(x.shape[1]/t)))
+    reshaped = np.zeros((int(x.shape[0]/t),int(x.shape[1]/t)),dtype=int)
     iCtr = 0
     for row in rowRange:
         jCtr = 0
         for col in colRange:
             sum = 0
-            for i in range(0,t):
-                for j in range(0,t):
-                    sum+=x[row+i][col+j]
-            mean = sum/(t*t)
-            reshaped[iCtr][jCtr] = mean
+            reshaped[iCtr][jCtr] = np.mean(x[row:row+t, col:col+t])
             jCtr = jCtr + 1
         iCtr = iCtr + 1
     return reshaped
 
 def rowdiff(x):
-    row_diff = np.zeros((x.shape[0],x.shape[1]-1))
+    row_diff = np.zeros((x.shape[0],x.shape[1]-1),dtype=int)
     for i in range(0,x.shape[0]):
         for j in range(0,x.shape[1]-1):
             row_ij = x[i][j+1]-x[i][j]
             if(row_ij > 1):
                 row_ij = 1
-            elif(row_ij < 1):
+            elif(row_ij < -1):
                 row_ij = -1
             else:
                 row_ij = 0
@@ -89,13 +85,13 @@ def rowdiff(x):
     return y
 
 def coldiff(x):
-    col_diff = np.zeros((x.shape[0]-1,x.shape[1]))
+    col_diff = np.zeros((x.shape[0]-1,x.shape[1]),dtype=int)
     for i in range(0,x.shape[0]):
         for j in range(0,x.shape[1]-1):
             col_ij = x[j+1][i]-x[j][i]
             if(col_ij > 1):
                 col_ij = 1
-            elif(col_ij < 1):
+            elif(col_ij < -1):
                 col_ij = -1
             else:
                 col_ij = 0
